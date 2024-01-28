@@ -99,7 +99,7 @@ async function getUsers(){
     // Connect the client to the server	(optional starting in v4.7)
     connectToDb();
     //const results=await client.db("chatApp").collection('userData').find().toArray();
-    const results = await client.db("chatApp").collection('userData').find({}, { projection: { _id: 1, username: 1 } }).toArray();
+    const results = await client.db("chatApp").collection('userData').find({}, { projection: { _id: 1, username: 1 ,imageUrl:1} }).toArray();
     //console.log(results);
     return results;
     
