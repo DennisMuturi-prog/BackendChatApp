@@ -1,6 +1,7 @@
-const {insertUserData,changePassword,authenticateUser, getLiveMessages,getMessages,insertMessages,getUsers}=require('./db.js');
+const {insertUserData,changePassword,authenticateUser, getLiveMessages,getMessages,insertMessages,getUsers,addImageUrlToUser}=require('./db.js');
 const io=require('socket.io')(3000,{cors:{origin:'http://localhost:5173'}});
 const express=require('express');
+const { cloudinary } = require('./utils/cloudinary');
 const app=express();
 const cors=require('cors');
 const jwt=require('jsonwebtoken');
@@ -37,8 +38,8 @@ io.on('connection',async (socket)=>{
         changeStream.close();
     })
 })
-app.use(express.urlencoded({extended:false}));
-app.use(express.json());
+app.use(express.urlencoded({extended:false,limit: '50mb'}));
+app.use(express.json({ limit: '50mb' }));
 app.use(cookieParser());
 app.use(cors(corsOptions));
 function verifyUser(req,res,next){
@@ -98,6 +99,21 @@ app.post('/changepassword',verifyUser,async (req,res)=>{
         res.json({status:'wrong initial password'});
     }   
 })
+app.post('/profilepic',verifyUser,async (req,res)=>{
+    //console.log(req.body.imageUrl);
+    const fileStr=req.body.imageUrl;
+    const uploadResponse=await cloudinary.uploader.upload(fileStr,{
+    upload_preset:'MyChatApp'
+    });
+    const profileAddPic=await addImageUrlToUser(req.userid,uploadResponse.secure_url);
+    if(profileAddPic){
+        res.json({message:'successfully added profile pic',imageUrl:uploadResponse.secure_url});
+    }
+    else{
+        res.status(500).json({message:'error in adding profile pic'})
+    }
+    console.log(uploadResponse);
+})
 app.post('/login',async (req,res)=>{
     const authenticateUserperson=await authenticateUser(req.body)
     if(authenticateUserperson.status=='success'){
@@ -105,7 +121,7 @@ app.post('/login',async (req,res)=>{
         //console.log(userId);
         //insertMessages({userid:userId,message:'ODM Baba'})
         res.cookie('token',jwt.sign({userid:userId},process.env.JWT_SECRET))
-        res.json({status:'success',username:authenticateUserperson.results[0].username});
+        res.json({status:'success',username:authenticateUserperson.results[0].username,imageUrl:authenticateUserperson.results[0].imageUrl});
     }
     else if(authenticateUserperson=='wrong password'){
         res.json({status:'wrong password'})
