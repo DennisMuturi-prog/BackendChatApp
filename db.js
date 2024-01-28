@@ -75,7 +75,7 @@ async function getLiveMessages(socket,userid){
     const objectifiedId=new ObjectId(userid);
     const changeStream = collection.watch([{$match:{'operationType':'insert','fullDocument.receiverid':objectifiedId}}]);
     changeStream.on('change', (next) => {
-      socket.emit('db-changes',{message:next.fullDocument.message,senderid:next.fullDocument.senderid});
+      socket.emit('db-changes',{message:next.fullDocument.message,senderid:next.fullDocument.senderid,time:next.fullDocument.time});
       console.log(next);
     });
     return changeStream;
@@ -120,6 +120,20 @@ async function insertMessages({userid,message,receiverid}) {
     console.error('Error in insertMessages:', error);
   }
 }
+async function addImageUrlToUser(userid, imageUrl) {
+  try {
+    // Connect the client to the server
+    await connectToDb();
+    const objectifiedId = new ObjectId(userid);
+    const result = await client.db("chatApp").collection('userData').updateOne(
+      { _id: objectifiedId },
+      { $set: { imageUrl: imageUrl } }
+    );
+    return result;
+  } catch (error) {
+    console.error('Error in addImageUrlToUser:', error);
+  }
+}
 //getUsers();
 //insertUserData({username:'Uhuru',password:'Kenyatta'});
 //rambo();
@@ -130,5 +144,5 @@ async function insertMessages({userid,message,receiverid}) {
 //insertMessages({userid:'65a6a534c9ba55595a231a61',message:'sasa Owino'})
 //rambo(null,'65a6a534c9ba55595a231a61'); 
 
-module.exports={insertUserData,changePassword,authenticateUser,getLiveMessages,getMessages,insertMessages,getUsers}
+module.exports={insertUserData,changePassword,authenticateUser,getLiveMessages,getMessages,insertMessages,getUsers,addImageUrlToUser}
 
