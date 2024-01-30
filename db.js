@@ -37,7 +37,7 @@ async function insertUserData({email,username,password}) {
     connectToDb();
     const hash = await bcrypt.hash(password,10);
     // Store hash in your password DB.
-    const results = await client.db("chatApp").collection('userData').insertOne({email:email,username:username,password:hash});
+    const results = await client.db("chatApp").collection('userData').insertOne({email:email,username:username,password:hash,status:'offline'});
     return results.insertedId;
   }  catch (error) {
     console.error('Error in insertUserUserData:', error);
@@ -99,7 +99,7 @@ async function getUsers(){
     // Connect the client to the server	(optional starting in v4.7)
     connectToDb();
     //const results=await client.db("chatApp").collection('userData').find().toArray();
-    const results = await client.db("chatApp").collection('userData').find({}, { projection: { _id: 1, username: 1 ,imageUrl:1} }).toArray();
+    const results = await client.db("chatApp").collection('userData').find({}, { projection: { _id: 1, username: 1 ,imageUrl:1,status:1} }).toArray();
     //console.log(results);
     return results;
     
@@ -134,6 +134,35 @@ async function addImageUrlToUser(userid, imageUrl) {
     console.error('Error in addImageUrlToUser:', error);
   }
 }
+async function changeUserStatusOnline(userid) {
+  try {
+    // Connect the client to the server
+    await connectToDb();
+    const objectifiedId = new ObjectId(userid);
+    const result = await client.db("chatApp").collection('userData').updateOne(
+      { _id: objectifiedId },
+      { $set: { status: 'online' } }
+    );
+    return result;
+  } catch (error) {
+    console.error('Error in changeUserStatusOnline:', error);
+  }
+}
+async function changeUserStatusOffline(userid) {
+  try {
+    // Connect the client to the server
+    await connectToDb();
+    const objectifiedId = new ObjectId(userid);
+    const result = await client.db("chatApp").collection('userData').updateOne(
+      { _id: objectifiedId },
+      { $set: { status: 'offline' } }
+    );
+    return result;
+  } catch (error) {
+    console.error('Error in changeUserStatusOffline:', error);
+  }
+}
+
 //getUsers();
 //insertUserData({username:'Uhuru',password:'Kenyatta'});
 //rambo();
@@ -144,5 +173,5 @@ async function addImageUrlToUser(userid, imageUrl) {
 //insertMessages({userid:'65a6a534c9ba55595a231a61',message:'sasa Owino'})
 //rambo(null,'65a6a534c9ba55595a231a61'); 
 
-module.exports={insertUserData,changePassword,authenticateUser,getLiveMessages,getMessages,insertMessages,getUsers,addImageUrlToUser}
+module.exports={insertUserData,changePassword,authenticateUser,getLiveMessages,getMessages,insertMessages,getUsers,addImageUrlToUser,changeUserStatusOnline,changeUserStatusOffline}
 
