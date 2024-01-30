@@ -1,4 +1,4 @@
-const {insertUserData,changePassword,authenticateUser, getLiveMessages,getMessages,insertMessages,getUsers,addImageUrlToUser}=require('./db.js');
+const {insertUserData,changePassword,authenticateUser, getLiveMessages,getMessages,insertMessages,getUsers,addImageUrlToUser,changeUserStatusOnline,changeUserStatusOffline}=require('./db.js');
 const io=require('socket.io')(3000,{cors:{origin:'http://localhost:5173'}});
 const express=require('express');
 const { cloudinary } = require('./utils/cloudinary');
@@ -11,7 +11,6 @@ const corsOptions = {
   origin: 'http://localhost:5173', // replace with the origin of your client
   credentials: true, // this allows the session cookie to be sent with the request
 };
-let onlineUsers=[];
 dotenv.config();
 io.use((socket,next)=>{
     if(socket.handshake.auth.token){
@@ -33,17 +32,14 @@ io.use((socket,next)=>{
 io.on('connection',async (socket)=>{
     console.log(socket.id);
     //console.log(socket.userid)
+    changeUserStatusOnline(socket.userid);
     const changeStream=await getLiveMessages(socket,socket.userid);
-    onlineUsers.push(socket.userid);
-    setTimeout(() => {
-        socket.emit('onlineUsers', onlineUsers);
-     }, 5000); 
     socket.broadcast.emit('online',socket.userid);
     socket.on('disconnect',()=>{
         console.log('goodbye');
         changeStream.close();
         io.emit('offline',socket.userid);
-        onlineUsers = onlineUsers.filter(userid => userid !== socket.userid);
+        changeUserStatusOffline(socket.userid);
     })
 })
 app.use(express.urlencoded({extended:false,limit: '50mb'}));
