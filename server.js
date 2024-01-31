@@ -1,5 +1,6 @@
 const {insertUserData,changePassword,authenticateUser, getLiveMessages,getMessages,insertMessages,getUsers,addImageUrlToUser,changeUserStatusOnline,changeUserStatusOffline}=require('./db.js');
-const io=require('socket.io')(3000,{cors:{origin:'http://localhost:5173'}});
+const portSocket=process.env.PORT || 3000;
+const io=require('socket.io')(portSocket,{cors:{origin:'http://localhost:5173'}});
 const express=require('express');
 const { cloudinary } = require('./utils/cloudinary');
 const app=express();
@@ -137,7 +138,8 @@ app.post('/login',async (req,res)=>{
         res.send('failure');
     }
 })
-app.listen(4000);
+const port=process.env.PORT || 4000
+app.listen(port);
 /*io.on('connection',socket=>{
     console.log(socket.id);
     socket.on('custom-event',(postmanMessage,room)=>{
