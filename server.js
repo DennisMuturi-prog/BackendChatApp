@@ -16,9 +16,9 @@ const corsOptions = {
 };
 dotenv.config();
 io.use((socket,next)=>{
-    if(socket.handshake.headers.token){
-        socket.username=socket.handshake.headers.token;
-        jwt.verify(socket.handshake.headers.token,process.env.JWT_SECRET,(err,decoded)=>{
+    if(socket.handshake.auth.token){
+        socket.username=socket.handshake.auth.token;
+        jwt.verify(socket.handshake.auth.token,process.env.JWT_SECRET,(err,decoded)=>{
             if(err){
                next(new Error('wrong token'));
             }else{
