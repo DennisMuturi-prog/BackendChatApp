@@ -1,22 +1,24 @@
 const {insertUserData,changePassword,authenticateUser, getLiveMessages,getMessages,insertMessages,getUsers,addImageUrlToUser,changeUserStatusOnline,changeUserStatusOffline,connectToDb}=require('./db.js');
-const portSocket=process.env.PORT || 3000;
-const io=require('socket.io')(portSocket,{cors:{origin:'http://localhost:5173'}});
 const express=require('express');
+const { createServer } = require("http");
+const { Server } = require("socket.io");
 const { cloudinary } = require('./utils/cloudinary');
 const app=express();
 const cors=require('cors');
 const jwt=require('jsonwebtoken');
 const dotenv=require('dotenv');
 const cookieParser=require('cookie-parser');
+const httpServer = createServer(app);
+const io=new Server(httpServer, { cors:{origin:'http://localhost:5173'} });
 const corsOptions = {
   origin: 'http://localhost:5173', // replace with the origin of your client
   credentials: true, // this allows the session cookie to be sent with the request
 };
 dotenv.config();
 io.use((socket,next)=>{
-    if(socket.handshake.auth.token){
-        socket.username=socket.handshake.auth.token;
-        jwt.verify(socket.handshake.auth.token,process.env.JWT_SECRET,(err,decoded)=>{
+    if(socket.handshake.headers.token){
+        socket.username=socket.handshake.headers.token;
+        jwt.verify(socket.handshake.headers.token,process.env.JWT_SECRET,(err,decoded)=>{
             if(err){
                next(new Error('wrong token'));
             }else{
@@ -31,7 +33,7 @@ io.use((socket,next)=>{
     }
 })
 io.on('connection',async (socket)=>{
-    console.log(socket.id);
+    //console.log(socket.id);
     //console.log(socket.userid)
     changeUserStatusOnline(socket.userid);
     const changeStream=await getLiveMessages(socket,socket.userid);
@@ -140,7 +142,7 @@ app.post('/login',async (req,res)=>{
 })
 const port=process.env.PORT || 4000;
 connectToDb().then(()=>{
-    app.listen(port);
+    httpServer.listen(port);
 })
 
 /*io.on('connection',socket=>{
