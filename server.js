@@ -140,7 +140,7 @@ app.post('/login',async (req,res)=>{
 })
 const port=process.env.PORT || 4000;
 connectToDb().then(()=>{
-    app.listen(port,"0.0.0.0");
+    app.listen(port);
 })
 
 /*io.on('connection',socket=>{
