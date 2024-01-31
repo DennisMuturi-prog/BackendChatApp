@@ -10,7 +10,14 @@ const client = new MongoClient(process.env.CONNECTIONSTRING, {
   }
 });
 async function connectToDb() {
+  try {
     await client.connect(); 
+    
+  } catch (error) {
+    onsole.log(error);
+    process.exit(1); 
+  }
+    
 }
 
 async function closeDb() {
@@ -173,5 +180,5 @@ async function changeUserStatusOffline(userid) {
 //insertMessages({userid:'65a6a534c9ba55595a231a61',message:'sasa Owino'})
 //rambo(null,'65a6a534c9ba55595a231a61'); 
 
-module.exports={insertUserData,changePassword,authenticateUser,getLiveMessages,getMessages,insertMessages,getUsers,addImageUrlToUser,changeUserStatusOnline,changeUserStatusOffline}
+module.exports={insertUserData,changePassword,authenticateUser,getLiveMessages,getMessages,insertMessages,getUsers,addImageUrlToUser,changeUserStatusOnline,changeUserStatusOffline,connectToDb}
 
