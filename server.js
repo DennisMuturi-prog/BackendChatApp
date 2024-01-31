@@ -1,4 +1,4 @@
-const {insertUserData,changePassword,authenticateUser, getLiveMessages,getMessages,insertMessages,getUsers,addImageUrlToUser,changeUserStatusOnline,changeUserStatusOffline}=require('./db.js');
+const {insertUserData,changePassword,authenticateUser, getLiveMessages,getMessages,insertMessages,getUsers,addImageUrlToUser,changeUserStatusOnline,changeUserStatusOffline,connectToDb}=require('./db.js');
 const portSocket=process.env.PORT || 3000;
 const io=require('socket.io')(portSocket,{cors:{origin:'http://localhost:5173'}});
 const express=require('express');
@@ -138,8 +138,11 @@ app.post('/login',async (req,res)=>{
         res.send('failure');
     }
 })
-const port=process.env.PORT || 4000
-app.listen(port);
+const port=process.env.PORT || 4000;
+connectToDb().then(()=>{
+    app.listen(port);
+})
+
 /*io.on('connection',socket=>{
     console.log(socket.id);
     socket.on('custom-event',(postmanMessage,room)=>{
