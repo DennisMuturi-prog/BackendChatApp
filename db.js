@@ -72,7 +72,7 @@ async function authenticateUser({email,password}) {
     }
     
   }  catch (error) {
-    console.error('Error in authenticateUser:', error);
+    console.log('Error in authenticateUser:', error);
   }
 }
 //insertUserData().catch(console.dir);
