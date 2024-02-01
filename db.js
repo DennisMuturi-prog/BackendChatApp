@@ -14,7 +14,7 @@ async function connectToDb() {
     await client.connect(); 
     
   } catch (error) {
-    onsole.log(error);
+    console.log(error);
     process.exit(1); 
   }
     
