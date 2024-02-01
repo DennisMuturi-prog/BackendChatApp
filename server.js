@@ -123,7 +123,8 @@ app.post('/profilepic',verifyUser,async (req,res)=>{
     }
 })
 app.post('/login',async (req,res)=>{
-    const authenticateUserperson=await authenticateUser(req.body)
+    try {
+         const authenticateUserperson=await authenticateUser(req.body)
     if(authenticateUserperson.status=='success'){
         const userId=authenticateUserperson.results[0]._id;
         //console.log(userId);
@@ -140,6 +141,13 @@ app.post('/login',async (req,res)=>{
     else{
         return res.send('failure');
     }
+
+        
+    } catch (error) {
+        console.log(error);
+        
+    }
+   
 })
 const port=process.env.PORT || 4000;
 httpServer.listen(port);
