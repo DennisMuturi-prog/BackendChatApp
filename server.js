@@ -20,7 +20,7 @@ io.use((socket,next)=>{
         socket.username=socket.handshake.auth.token;
         jwt.verify(socket.handshake.auth.token,process.env.JWT_SECRET,(err,decoded)=>{
             if(err){
-               console.log('error wrong token');
+               console.log('error wrong');
                return;
             }else{
                 socket.userid=decoded.userid;
@@ -129,8 +129,9 @@ app.post('/login',async (req,res)=>{
         const userId=authenticateUserperson.results[0]._id;
         //console.log(userId);
         //insertMessages({userid:userId,message:'ODM Baba'})
-        const jwtwebToken=jwt.sign({userid:userId},process.env.JWT_SECRET)
-        return res.cookie('token',jwtwebToken).json({status:'success',username:authenticateUserperson.results[0].username,imageUrl:authenticateUserperson.results[0].imageUrl});
+        const jwtwebToken=jwt.sign({userid:userId},process.env.JWT_SECRET);
+        console.log(jwtwebToken);
+        return res.cookie('token',jwtwebToken,{secure:true}).json({status:'success',username:authenticateUserperson.results[0].username,imageUrl:authenticateUserperson.results[0].imageUrl});
     }
     else if(authenticateUserperson=='wrong password'){
         return res.json({status:'wrong password'})
