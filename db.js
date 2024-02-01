@@ -35,7 +35,7 @@ async function changePassword({userid,password}) {
     console.log(results);
     return results;  
   }  catch (error) {
-    console.error('Error in ChangePassword:', error);
+    console.log('Error in ChangePassword:', error);
   }
 }
 async function insertUserData({email,username,password}) {
@@ -47,7 +47,7 @@ async function insertUserData({email,username,password}) {
     const results = await client.db("chatApp").collection('userData').insertOne({email:email,username:username,password:hash,status:'offline'});
     return results.insertedId;
   }  catch (error) {
-    console.error('Error in insertUserUserData:', error);
+    console.log('Error in insertUserUserData:', error);
   }
 }
 async function authenticateUser({email,password}) {
@@ -77,6 +77,7 @@ async function authenticateUser({email,password}) {
 }
 //insertUserData().catch(console.dir);
 async function getLiveMessages(socket,userid){
+  try {
     connectToDb();
     const collection=client.db('chatApp').collection('messages');
     const objectifiedId=new ObjectId(userid);
@@ -86,6 +87,11 @@ async function getLiveMessages(socket,userid){
       console.log(next);
     });
     return changeStream;
+    
+  } catch (error) {
+    console.log(error);
+  }
+    
 }
 async function getMessages(userid){
   try {
