@@ -129,16 +129,16 @@ app.post('/login',async (req,res)=>{
         //console.log(userId);
         //insertMessages({userid:userId,message:'ODM Baba'})
         const jwtwebToken=jwt.sign({userid:userId},process.env.JWT_SECRET)
-        res.cookie('token',jwtwebToken).json({status:'success',username:authenticateUserperson.results[0].username,imageUrl:authenticateUserperson.results[0].imageUrl});
+        return res.cookie('token',jwtwebToken).json({status:'success',username:authenticateUserperson.results[0].username,imageUrl:authenticateUserperson.results[0].imageUrl});
     }
     else if(authenticateUserperson=='wrong password'){
-        res.json({status:'wrong password'})
+        return res.json({status:'wrong password'})
     }
     else if(authenticateUserperson=='invalid email'){
-        res.json({status:'invalid email'});
+        return res.json({status:'invalid email'});
     }
     else{
-        res.send('failure');
+        return res.send('failure');
     }
 })
 const port=process.env.PORT || 4000;
