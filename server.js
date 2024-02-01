@@ -57,9 +57,10 @@ function verifyUser(req,res,next){
             }else{
                 req.userid=decoded.userid;
                 //console.log(req.userid);
+                next()
             }
         })  
-        next()
+        
     }
     else{
         return res.json({status:'no token given'});
