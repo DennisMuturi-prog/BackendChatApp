@@ -20,7 +20,7 @@ io.use((socket,next)=>{
         socket.username=socket.handshake.auth.token;
         jwt.verify(socket.handshake.auth.token,process.env.JWT_SECRET,(err,decoded)=>{
             if(err){
-               next(new Error('wrong token'));
+               console.log('error');
             }else{
                 socket.userid=decoded.userid;
                 //console.log(socket.userid);
@@ -29,7 +29,7 @@ io.use((socket,next)=>{
         })    
     }
     else{
-        next(new Error('please send token'));
+        console.log('error')
     }
 })
 io.on('connection',async (socket)=>{
