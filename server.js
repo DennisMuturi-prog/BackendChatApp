@@ -131,7 +131,7 @@ app.post('/login',async (req,res)=>{
         //insertMessages({userid:userId,message:'ODM Baba'})
         const jwtwebToken=jwt.sign({userid:userId},process.env.JWT_SECRET);
         console.log(jwtwebToken);
-        return res.cookie('token',jwtwebToken,{secure:true}).json({status:'success',username:authenticateUserperson.results[0].username,imageUrl:authenticateUserperson.results[0].imageUrl});
+        return res.cookie('token',jwtwebToken,{secure:true,sameSite:'none'}).json({status:'success',username:authenticateUserperson.results[0].username,imageUrl:authenticateUserperson.results[0].imageUrl});
     }
     else if(authenticateUserperson=='wrong password'){
         return res.json({status:'wrong password'})
