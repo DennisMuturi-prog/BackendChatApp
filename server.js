@@ -33,6 +33,9 @@ io.use((socket, next) => {
       }
     });
   }
+  else{
+    console.log('zero token');
+  }
 });
 io.on('connection',async (socket)=>{
     //console.log(socket.id);
