@@ -15,25 +15,25 @@ const corsOptions = {
   credentials: true, // this allows the session cookie to be sent with the request
 };
 dotenv.config();
-io.use((socket,next)=>{
-    if(socket.handshake.auth.token){
-        socket.username=socket.handshake.auth.token;
-        jwt.verify(socket.handshake.auth.token,process.env.JWT_SECRET,(err,decoded)=>{
-            if(err){
-               console.log('error wrong');
-               return;
-            }else{
-                socket.userid=decoded.userid;
-                //console.log(socket.userid);
-                next();
-            }
-        })    
-    }
-    else{
-        console.log('no token');
+const cookie = require('cookie');
+
+io.use((socket, next) => {
+  if (socket.handshake.headers && socket.handshake.headers.cookie) {
+    let cookies = cookie.parse(socket.handshake.headers.cookie);
+    let token = cookies['token'];
+  
+    // Now you can use the token...
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+      if(err){
+        console.log('error wrong');
         return;
-    }
-})
+      } else {
+        socket.userid = decoded.userid;
+        next();
+      }
+    });
+  }
+});
 io.on('connection',async (socket)=>{
     //console.log(socket.id);
     //console.log(socket.userid)
