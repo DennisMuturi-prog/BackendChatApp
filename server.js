@@ -21,6 +21,7 @@ io.use((socket,next)=>{
         jwt.verify(socket.handshake.auth.token,process.env.JWT_SECRET,(err,decoded)=>{
             if(err){
                console.log('error');
+               return;
             }else{
                 socket.userid=decoded.userid;
                 //console.log(socket.userid);
@@ -29,7 +30,8 @@ io.use((socket,next)=>{
         })    
     }
     else{
-        console.log('error')
+        console.log('error');
+        return;
     }
 })
 io.on('connection',async (socket)=>{
@@ -68,21 +70,20 @@ function verifyUser(req,res,next){
 }
 app.get('/messages',verifyUser,async (req,res)=>{
     const messages=await getMessages(req.userid);
-    res.json(messages);
+    return res.json(messages);
 })
 app.post('/sendmessage',verifyUser,async (req,res)=>{
     insertMessages({userid:req.userid,message:req.body.message,receiverid:req.body.receiverid});
-    res.json({status:'suceessfully added message'});
+    return res.json({status:'suceessfully added message'});
 })
 app.post('/register',(req,res)=>{
         insertUserData(req.body).then((userId)=>{
         if(userId){
             //console.log(userId);
-            res.cookie('token',jwt.sign({userid:userId},process.env.JWT_SECRET));
-            res.json({status:'successfully registered'});
+            return res.cookie('token',jwt.sign({userid:userId},process.env.JWT_SECRET)).json({status:'successfully registered'});;
         }
         else{
-        res.json({status:'failure register again'});
+           return res.json({status:'failure register again'});
         }
 
     }) 
@@ -90,21 +91,21 @@ app.post('/register',(req,res)=>{
 app.get('/userfriends',verifyUser,async (req,res)=>{
     //console.log('users')
     const users=await getUsers();
-    res.json(users);
+    return res.json(users);
 })
 app.post('/changepassword',verifyUser,async (req,res)=>{
     const authenticateUserperson=await authenticateUser(req.body);
     if(authenticateUserperson.status=='success'){
         const changeuserPassword=await changePassword({userid:req.userid,password:req.body.newpassword});
         if(changeuserPassword){
-            res.json({status:'change Password successfully'})
+           return  res.json({status:'change Password successfully'})
         }
         else{
-            res.json({status:'failed to change password'});
+            return res.json({status:'failed to change password'});
         }
     }
     else{
-        res.json({status:'wrong initial password'});
+        return res.json({status:'wrong initial password'});
     }   
 })
 app.post('/profilepic',verifyUser,async (req,res)=>{
@@ -115,12 +116,11 @@ app.post('/profilepic',verifyUser,async (req,res)=>{
     });
     const profileAddPic=await addImageUrlToUser(req.userid,uploadResponse.secure_url);
     if(profileAddPic){
-        res.json({message:'successfully added profile pic',imageUrl:uploadResponse.secure_url});
+        return res.json({message:'successfully added profile pic',imageUrl:uploadResponse.secure_url});
     }
     else{
-        res.status(500).json({message:'error in adding profile pic'})
+        return res.status(500).json({message:'error in adding profile pic'})
     }
-    console.log(uploadResponse);
 })
 app.post('/login',async (req,res)=>{
     const authenticateUserperson=await authenticateUser(req.body)
