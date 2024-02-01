@@ -9,9 +9,9 @@ const jwt=require('jsonwebtoken');
 const dotenv=require('dotenv');
 const cookieParser=require('cookie-parser');
 const httpServer = createServer(app);
-const io=new Server(httpServer, { cors:{origin:'http://localhost:5173'} });
+const io=new Server(httpServer, { cors:{origin:'https://dennismuturi-prog.github.io/FrontEndChatApp/'} });
 const corsOptions = {
-  origin: 'http://localhost:5173', // replace with the origin of your client
+  origin: 'https://dennismuturi-prog.github.io/FrontEndChatApp/', // replace with the origin of your client
   credentials: true, // this allows the session cookie to be sent with the request
 };
 dotenv.config();
