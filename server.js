@@ -29,6 +29,7 @@ io.use((socket, next) => {
         return;
       } else {
         socket.userid = decoded.userid;
+        console.log(socket.userid);
         next();
       }
     });
