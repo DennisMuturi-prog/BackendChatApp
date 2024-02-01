@@ -141,27 +141,8 @@ app.post('/login',async (req,res)=>{
     }
 })
 const port=process.env.PORT || 4000;
-connectToDb().then(()=>{
-    httpServer.listen(port);
-})
+httpServer.listen(port);
 
-/*io.on('connection',socket=>{
-    console.log(socket.id);
-    socket.on('custom-event',(postmanMessage,room)=>{
-        console.log(postmanMessage);
-        if(room==''){
-            socket.broadcast.emit('bro-code','thank you')
-
-        }
-        else{
-            socket.to(room).emit('bro-code','thank you');
-        }
-        
-    })
-    socket.on('join-room',(room)=>{
-        socket.join(room);
-    })
-})*/
 
 
 
