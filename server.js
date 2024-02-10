@@ -9,9 +9,9 @@ const jwt=require('jsonwebtoken');
 const dotenv=require('dotenv');
 const cookieParser=require('cookie-parser');
 const httpServer = createServer(app);
-const io=new Server(httpServer, { cors:{origin:'https://dennismuturi-prog.github.io',credentials:true} });
+const io=new Server(httpServer, { cors:{origin:'http://localhost:5173',credentials:true} });
 const corsOptions = {
-  origin: 'https://dennismuturi-prog.github.io', // replace with the origin of your client
+  origin: 'http://localhost:5173', // replace with the origin of your client
   credentials: true, // this allows the session cookie to be sent with the request
 };
 dotenv.config();
@@ -135,7 +135,7 @@ app.post('/login',async (req,res)=>{
         //insertMessages({userid:userId,message:'ODM Baba'})
         const jwtwebToken=jwt.sign({userid:userId},process.env.JWT_SECRET);
         console.log(jwtwebToken);
-        return res.cookie('token',jwtwebToken,{secure:true,sameSite:'none'}).json({status:'success',username:authenticateUserperson.results[0].username,imageUrl:authenticateUserperson.results[0].imageUrl});
+        return res.cookie('token',jwtwebToken).json({status:'success',username:authenticateUserperson.results[0].username,imageUrl:authenticateUserperson.results[0].imageUrl});
     }
     else if(authenticateUserperson=='wrong password'){
         return res.json({status:'wrong password'})
