@@ -83,7 +83,7 @@ async function getLiveMessages(socket,userid){
     const objectifiedId=new ObjectId(userid);
     const changeStream = collection.watch([{$match:{'operationType':'insert','fullDocument.receiverid':objectifiedId}}]);
     changeStream.on('change', (next) => {
-      socket.emit('db-changes',{message:next.fullDocument.message,senderid:next.fullDocument.senderid,time:next.fullDocument.time});
+      socket.emit('db-changes',{message:next.fullDocument.message,senderid:next.fullDocument.senderid,time:next.fullDocument.time,readstatus:next.fullDocument.readstatus});
       console.log(next);
     });
     return changeStream;
@@ -127,7 +127,7 @@ async function insertMessages({userid,message,receiverid}) {
     connectToDb();
     const objectifiedId=new ObjectId(userid);
     const objectifiedReceiverId=new ObjectId(receiverid);
-    const results=await client.db("chatApp").collection('messages').insertOne({senderid:objectifiedId,message:message,receiverid:objectifiedReceiverId,time:new Date()});
+    const results=await client.db("chatApp").collection('messages').insertOne({senderid:objectifiedId,message:message,receiverid:objectifiedReceiverId,time:new Date(),readstatus:'unread'});
     console.log(results); 
   }  catch (error) {
     console.error('Error in insertMessages:', error);
@@ -175,7 +175,19 @@ async function changeUserStatusOffline(userid) {
     console.error('Error in changeUserStatusOffline:', error);
   }
 }
-
+async function changeMessageStatus() {
+  try {
+    // Connect the client to the server
+    await connectToDb();
+    const result = await client.db("chatApp").collection('messages').updateMany(
+      {},
+      { $set: { readstatus: 'read' } }
+    );
+    return result;
+  } catch (error) {
+    console.error('Error in changeUserStatusOffline:', error);
+  }
+}
 //getUsers();
 //insertUserData({username:'Uhuru',password:'Kenyatta'});
 //rambo();
