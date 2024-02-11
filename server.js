@@ -1,4 +1,4 @@
-const {insertUserData,changePassword,authenticateUser, getLiveMessages,getMessages,insertMessages,getUsers,addImageUrlToUser,changeUserStatusOnline,changeUserStatusOffline,connectToDb}=require('./db.js');
+const {insertUserData,changePassword,authenticateUser, getLiveMessages,getMessages,insertMessages,getUsers,addImageUrlToUser,changeUserStatusOnline,changeUserStatusOffline,getLiveReadMessages,changeMessageStatus}=require('./db.js');
 const express=require('express');
 const { createServer } = require("http");
 const { Server } = require("socket.io");
@@ -43,10 +43,12 @@ io.on('connection',async (socket)=>{
     //console.log(socket.userid)
     changeUserStatusOnline(socket.userid);
     const changeStream=await getLiveMessages(socket,socket.userid);
+    const changeReadMessagesStream=await getLiveReadMessages(socket,socket.userid);
     socket.broadcast.emit('online',socket.userid);
     socket.on('disconnect',()=>{
         console.log('goodbye');
         changeStream.close();
+        changeReadMessagesStream.close();
         io.emit('offline',socket.userid);
         changeUserStatusOffline(socket.userid);
     })
@@ -125,6 +127,11 @@ app.post('/profilepic',verifyUser,async (req,res)=>{
     else{
         return res.status(500).json({message:'error in adding profile pic'})
     }
+})
+app.post('/readMessage',verifyUser,async (req,res)=>{
+    console.log(req.body._id);
+    const readMessage=await changeMessageStatus(req.body._id);
+    res.json({message:'success'});
 })
 app.post('/login',async (req,res)=>{
     try {
