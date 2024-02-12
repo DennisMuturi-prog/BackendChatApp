@@ -196,7 +196,10 @@ async function getLiveReadMessages(socket,userid){
     await connectToDb();
     const collection=client.db('chatApp').collection('messages');
     const objectifiedId=new ObjectId(userid);
-    const changeStream = collection.watch([{$match:{'operationType':'update','fullDocument.senderid':objectifiedId}}],
+    const changeStream = collection.watch([{$match:{'operationType':'update',$or: [
+        { 'fullDocument.senderid': objectifiedId },
+        { 'fullDocument.receiverid': objectifiedId }
+      ]}}],
     {fullDocument:'updateLookup'});
     changeStream.on('change', (next) => {
       socket.emit('read-changes',{_id:next.fullDocument._id});
