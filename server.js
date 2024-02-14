@@ -86,7 +86,7 @@ app.post('/register',(req,res)=>{
         insertUserData(req.body).then((userId)=>{
         if(userId){
             //console.log(userId);
-            return res.cookie('token',jwt.sign({userid:userId},process.env.JWT_SECRET)).json({status:'successfully registered'});;
+            return res.cookie('token',jwt.sign({userid:userId},process.env.JWT_SECRET),{secure:true,sameSite:'none'}).json({status:'successfully registered'});;
         }
         else{
            return res.json({status:'failure register again'});
@@ -142,7 +142,7 @@ app.post('/login',async (req,res)=>{
         //insertMessages({userid:userId,message:'ODM Baba'})
         const jwtwebToken=jwt.sign({userid:userId},process.env.JWT_SECRET);
         console.log(jwtwebToken);
-        return res.cookie('token',jwtwebToken).json({status:'success',username:authenticateUserperson.results[0].username,imageUrl:authenticateUserperson.results[0].imageUrl});
+        return res.cookie('token',jwtwebToken,{secure:true,sameSite:'none'}).json({status:'success',username:authenticateUserperson.results[0].username,imageUrl:authenticateUserperson.results[0].imageUrl});
     }
     else if(authenticateUserperson=='wrong password'){
         return res.json({status:'wrong password'})
